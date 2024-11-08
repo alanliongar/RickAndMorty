@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -46,7 +48,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun CharacterListScreen() {
+fun CharacterListScreen(navController: NavHostController) {
     val characterApiService =
         RetrofitClient.retrofitInstance.create(CharactersServices::class.java)
     var listOfCharacters = remember { mutableStateOf<CharacterListResponse?>(null) }
@@ -55,60 +57,56 @@ fun CharacterListScreen() {
             val response = characterApiService.getAllCharacters()
             if (response.results.isNotEmpty()) {
                 listOfCharacters.value = response
-                Log.d("MainActivityAlan", "Not Empty Call")
+                Log.d("CharacterListScreen", "Success")
             } else {
                 listOfCharacters.value = null
-                Log.d("MainActivityAlan", "EmptyCall")
+                Log.d("CharacterListScreen", "EmptyCall")
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
-            Log.d("MainActivityAlan", ex.message.toString() + "Alannn")
+            Log.d("CharacterListScreen", ex.message.toString())
             listOfCharacters.value = null
         }
     }
-    CharacterListContent(listOfCharacters = listOfCharacters)
-}
-
-@Composable
-private fun CharacterListContent(modifier: Modifier = Modifier, listOfCharacters: MutableState<CharacterListResponse?>) {
-    Column {
-        screenResult(listOfCharacters = listOfCharacters)
+    CharacterListContent(listOfCharacters = listOfCharacters) { characterItemClicked ->
+        navController.navigate("characterDetail/${characterItemClicked.id}")
     }
 }
 
 @Composable
-private fun screenResult(
-    modifier: Modifier = Modifier,
-    listOfCharacters: MutableState<CharacterListResponse?>
-) {
+private fun CharacterListContent(listOfCharacters: MutableState<CharacterListResponse?>, onClick: (CharacterDto) -> Unit) {
     if (listOfCharacters.value == null) {
         Text("Carregando....")
     } else {
-        CharactersGrid(listOfCharacters.value)
+        CharactersGrid(listOfCharacters.value, onClick = onClick)
     }
 }
 
+
 @Composable
-private fun CharactersGrid(listOfCharacters: CharacterListResponse?) {
+private fun CharactersGrid(
+    listOfCharacters: CharacterListResponse?,
+    onClick: (CharacterDto) -> Unit
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(0.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp)
-    ){
+    ) {
         if (listOfCharacters != null) {
-            items(listOfCharacters.results.size){index ->
-                CharacterCard(character = listOfCharacters.results[index])
+            items(listOfCharacters.results.size) { index ->
+                CharacterCard(character = listOfCharacters.results[index], onClick = onClick)
             }
-        }else{
+        } else {
             //loading_State
         }
     }
 }
 
 @Composable
-private fun CharacterCard(character: CharacterDto,/* onClick: (CharacterDto) -> Unit*/) {
+private fun CharacterCard(character: CharacterDto, onClick: (CharacterDto) -> Unit) {
     val imageUrl: String = character.imageUrl
     val context = LocalContext.current
     var color by remember { mutableStateOf(Color.Transparent) }
@@ -123,7 +121,7 @@ private fun CharacterCard(character: CharacterDto,/* onClick: (CharacterDto) -> 
             .background(color = color)
             .border(2.dp, color, RoundedCornerShape(16.dp))
             .height(200.dp)
-        /*.clickable { onClick.invoke(character) }*/,
+            .clickable { onClick.invoke(character) },
         // Cor de fundo baseada no personagem
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
