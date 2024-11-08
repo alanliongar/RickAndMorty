@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.devspace.rickandmorty.ui.theme.RickandmortyTheme
@@ -116,10 +115,10 @@ fun CharactersGrid(listOfCharacters: CharacterListResponse?) {
     ){
         if (listOfCharacters != null) {
             items(listOfCharacters.results.size){index ->
-                if (listOfCharacters != null) {
                     CharacterCard(character = listOfCharacters.results[index])
-                }
             }
+        }else{
+            //loading_State
         }
     }
 }
@@ -162,7 +161,6 @@ fun CharacterCard(character: CharacterDto,/* onClick: (CharacterDto) -> Unit*/) 
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
-            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
     }
