@@ -57,141 +57,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val characterApiService =
-                RetrofitClient.retrofitInstance.create(CharactersServices::class.java)
+
             RickandmortyTheme {
-                val scope = rememberCoroutineScope()
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var listOfCharacters = remember { mutableStateOf<CharacterListResponse?>(null) }
-                    LaunchedEffect(listOfCharacters.value) {
-                        try {
-                            val response = characterApiService.getAllCharacters()
-                            if (response.results.isNotEmpty()) {
-                                listOfCharacters.value = response
-                                Log.d("MainActivityAlan", "Not Empty Call")
-                            } else {
-                                listOfCharacters.value = null
-                                Log.d("MainActivityAlan", "EmptyCall")
-                            }
-                        } catch (ex: Exception) {
-                            ex.printStackTrace()
-                            Log.d("MainActivityAlan", ex.message.toString() + "Alannn")
-                            listOfCharacters.value = null
-                        }
-                    }
-                    Column {
-                        screenResult(listOfCharacters = listOfCharacters)
-                    }
+                    CharacterListScreen()
                 }
             }
         }
     }
 }
 
-@Composable
-fun screenResult(
-    modifier: Modifier = Modifier,
-    listOfCharacters: MutableState<CharacterListResponse?>
-) {
-    if (listOfCharacters.value == null) {
-        Text("Carregando....")
-    } else {
-        CharactersGrid(listOfCharacters.value)
-    }
-}
-
-@Composable
-fun CharactersGrid(listOfCharacters: CharacterListResponse?) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(0.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-        horizontalArrangement = Arrangement.spacedBy(3.dp)
-    ){
-        if (listOfCharacters != null) {
-            items(listOfCharacters.results.size){index ->
-                    CharacterCard(character = listOfCharacters.results[index])
-            }
-        }else{
-            //loading_State
-        }
-    }
-}
-
-@Composable
-fun CharacterCard(character: CharacterDto,/* onClick: (CharacterDto) -> Unit*/) {
-    val imageUrl: String = character.imageUrl
-    val context = LocalContext.current
-    var color by remember { mutableStateOf(Color.Transparent) }
-    LaunchedEffect(imageUrl) {
-        val dominantColor = getDominantColorFromImage(context, imageUrl)
-        color = dominantColor ?: Color.Transparent
-    }
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(color = color)
-            .border(2.dp, color, RoundedCornerShape(16.dp))
-            .height(200.dp)
-            /*.clickable { onClick.invoke(character) }*/,
-        // Cor de fundo baseada no personagem
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .build(),
-            contentDescription = "Image of ${character.name}",
-            modifier = Modifier
-                .width(150.dp)
-                .height(150.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Fit
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = character.name,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-suspend fun getDominantColorFromImage(
-    context: Context,
-    imageUrl: String?
-): Color? {
-    return withContext(Dispatchers.IO) {
-        val imageLoader = ImageLoader(context)
-        val request = ImageRequest.Builder(context)
-                .data(imageUrl)
-                .build()
-        return@withContext try {
-            val result = (imageLoader.execute(request) as SuccessResult).drawable
-            if (result is BitmapDrawable) {
-                val bitmap = result.bitmap
-                // Verifica se o bitmap é do tipo HARDWARE e converte se necessário
-                val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-
-                val palette = Palette.from(mutableBitmap).generate()
-                val dominantColor =
-                    palette.getDominantColor(androidx.compose.ui.graphics.Color.Black.toArgb())
-                Color(dominantColor).copy(alpha = 0.70f)
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Erro ao obter cor da imagem: ${e.message}")
-            null
-        }
-    }
-}

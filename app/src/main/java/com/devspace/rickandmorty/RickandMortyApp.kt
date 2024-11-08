@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 
+/*
 @Composable
 fun RickandMortyApp() {
     val navcontroller = rememberNavController()
@@ -17,9 +18,8 @@ fun RickandMortyApp() {
                 type = NavType.StringType
             })
         ) { backStackEntry ->
-            val characterId = requireNotNull()
+            val characterId = requireNotNull(backStackEntry.arguments?.getString("characterId"))
             CharacterDetailScreen(characterId = characterId)
         }
-
     }
-}
+}*/
