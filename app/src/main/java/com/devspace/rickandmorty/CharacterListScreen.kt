@@ -143,6 +143,7 @@ private fun CharacterCard(character: CharacterDto,/* onClick: (CharacterDto) -> 
         Text(
             text = character.name,
             fontWeight = FontWeight.Bold,
+            color = invertColor(color),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
             overflow = TextOverflow.Ellipsis
@@ -150,7 +151,14 @@ private fun CharacterCard(character: CharacterDto,/* onClick: (CharacterDto) -> 
     }
 }
 
-private suspend fun getDominantColorFromImage(
+fun invertColor(color: Color): Color { //negativo pras letras
+    val red = 1f - color.red
+    val green = 1f - color.green
+    val blue = 1f - color.blue
+    return Color(red, green, blue, color.alpha)
+}
+
+suspend fun getDominantColorFromImage(
     context: Context,
     imageUrl: String?
 ): Color? {

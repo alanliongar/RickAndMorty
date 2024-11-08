@@ -1,5 +1,7 @@
 package com.devspace.rickandmorty
 
+import androidx.compose.ui.graphics.Color
+
 data class CharacterDetailDto(
     val id: Int,
     val name: String,
@@ -8,7 +10,7 @@ data class CharacterDetailDto(
     val gender: String,
     val image: String,
     val origin: Origin,
-    val location: Location
+    val location: Location,
 ){
     data class Origin(val name: String, val url: String)
     data class Location(val name: String, val url: String)
