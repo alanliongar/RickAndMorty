@@ -73,12 +73,7 @@ fun CharacterDetailContent(character: CharacterDetailDto, modifier: Modifier = M
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = character.name,
-                fontSize = 36.sp,
-                color = readableColor(color.value),
-                fontWeight = FontWeight.Bold
-            )
+            AdjustableTextSize(character = character, color = color.value)
             Text(
                 text = "#${character?.id.toString()?.padStart(3, '0')}",
                 fontSize = 12.sp,
@@ -104,6 +99,31 @@ fun CharacterDetailContent(character: CharacterDetailDto, modifier: Modifier = M
         }
     }
 }
+
+@Composable
+fun AdjustableTextSize(character: CharacterDetailDto, color: Color) {
+    // Tamanho máximo da fonte
+    val maxFontSize = 36f // Usando Float para cálculo
+    // Definindo um limite máximo de caracteres para reduzir o tamanho da fonte
+    val maxLength = 20 // Pode ajustar esse valor dependendo de quanto você quer de limite
+
+    // Calcular o tamanho da fonte baseado no comprimento do nome
+    val fontSize = if (character.name.length > maxLength) {
+        // Se o nome for maior que o limite, reduz o tamanho da fonte proporcionalmente
+        (maxFontSize * (maxLength.toFloat() / character.name.length)).coerceAtMost(maxFontSize)
+    } else {
+        maxFontSize
+    }
+
+    // Convertendo de volta para TextUnit (sp)
+    Text(
+        text = character.name,
+        fontSize = fontSize.sp, // Convertendo o valor para TextUnit (sp)
+        color = readableColor(color),
+        fontWeight = FontWeight.Bold
+    )
+}
+
 
 @Composable
 fun CharacterInfo(character: CharacterDetailDto, color: Color) {
