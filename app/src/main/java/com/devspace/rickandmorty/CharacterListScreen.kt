@@ -141,7 +141,7 @@ private fun CharacterCard(character: CharacterDto, onClick: (CharacterDto) -> Un
         Text(
             text = character.name,
             fontWeight = FontWeight.Bold,
-            color = invertColor(color),
+            color = readableColor(color),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
             overflow = TextOverflow.Ellipsis
@@ -149,11 +149,13 @@ private fun CharacterCard(character: CharacterDto, onClick: (CharacterDto) -> Un
     }
 }
 
-fun invertColor(color: Color): Color { //negativo pras letras
-    val red = 1f - color.red
-    val green = 1f - color.green
-    val blue = 1f - color.blue
-    return Color(red, green, blue, color.alpha)
+fun readableColor(color: Color): Color {
+    val luminance = 0.2126f * color.red + 0.7152f * color.green + 0.0722f * color.blue
+    return if (luminance > 0.5f) {
+        Color.Black
+    } else {
+        Color.White
+    }
 }
 
 suspend fun getDominantColorFromImage(
