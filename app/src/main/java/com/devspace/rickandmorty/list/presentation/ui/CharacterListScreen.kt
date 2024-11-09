@@ -186,7 +186,19 @@ private fun CharacterListContent(
 fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val speciesOptions =
-        listOf("All", "Human", "Alien", "Mythological", "Animal", "Robot", "Unknown")
+        listOf(
+            "All",
+            "Alien",
+            "Animal",
+            "Cronenberg",
+            "Disease",
+            "Human",
+            "Humanoid",
+            "Mythological",
+            "Poppybutthole",
+            "Robot",
+            "unknown"
+        )
 
     Box(
         modifier = Modifier

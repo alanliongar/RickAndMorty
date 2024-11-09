@@ -8,6 +8,10 @@ import androidx.room.Update
 
 @Dao
 interface CharacterDao {
+
+    @Query("SELECT * FROM characterlistentity WHERE isFavorite = 1")
+    suspend fun getFavoriteCharacters(): List<CharacterListEntity>
+
     @Query(//Essa query busca o nome parcial ou completo, com a espécie no roomdatabase.
         """
         SELECT * FROM characterlistentity 
