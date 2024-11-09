@@ -26,11 +26,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -89,7 +87,7 @@ fun CharacterListScreen(
         onClick = { characterItemClicked ->
             navController.navigate("characterDetail/${characterItemClicked.id}")
         },
-        onFavoriteClick = onFavoriteClick // Passa para o filho
+        onFavoriteClick = onFavoriteClick
     )
 }
 
@@ -106,6 +104,9 @@ fun SearchAndFilter(viewModel: CharacterListViewModel) {
                     name = query,
                     species = if (selectedSpecies == "All") null else selectedSpecies
                 )
+            },
+            placeholder = {
+                Text("Search for a character...")
             }
         )
         SpeciesDropdownMenu(
@@ -152,7 +153,7 @@ fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> 
             .padding(8.dp)
     ) {
         Text(
-            text = "Espécie: $selectedSpecies",
+            text = "Specie: $selectedSpecies",
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = true }
@@ -210,7 +211,6 @@ private fun CharacterCard(
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(true) }
     var color by remember { mutableStateOf(Color.Transparent) }
-    var isFavorite by remember { mutableStateOf(false) }
 
     LaunchedEffect(imageUrl) {
         isLoading = true
