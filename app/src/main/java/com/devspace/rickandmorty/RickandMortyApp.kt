@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.devspace.rickandmorty.detail.presentation.ui.CharacterDetailScreen
+import com.devspace.rickandmorty.list.presentation.ui.CharacterListScreen
 
 
 @Composable

@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty
+package com.devspace.rickandmorty.detail.presentation.ui
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -33,11 +33,16 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.devspace.rickandmorty.detail.data.CharacterDetailDto
+import com.devspace.rickandmorty.common.RetrofitClient
+import com.devspace.rickandmorty.detail.data.CharacterDetailServices
+import com.devspace.rickandmorty.list.presentation.ui.getDominantColorFromImage
+import com.devspace.rickandmorty.list.presentation.ui.readableColor
 
 @Composable
 fun CharacterDetailScreen(characterId: String) {
     val characterApiService =
-        RetrofitClient.retrofitInstance.create(CharactersServices::class.java)
+        RetrofitClient.retrofitInstance.create(CharacterDetailServices::class.java)
     var characterDetail = remember { mutableStateOf<CharacterDetailDto?>(null) }
     LaunchedEffect(characterDetail.value) {
         try {

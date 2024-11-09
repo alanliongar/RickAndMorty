@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty
+package com.devspace.rickandmorty.list.data
 
 import com.google.gson.annotations.SerializedName
 

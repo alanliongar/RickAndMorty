@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty
+package com.devspace.rickandmorty.list.data
 
 import androidx.room.PrimaryKey
 

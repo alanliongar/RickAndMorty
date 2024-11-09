@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty
+package com.devspace.rickandmorty.list.presentation.ui
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -38,20 +38,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.SuccessResult
+import com.devspace.rickandmorty.list.data.CharacterDto
+import com.devspace.rickandmorty.list.data.CharacterListResponse
+import com.devspace.rickandmorty.common.RetrofitClient
+import com.devspace.rickandmorty.list.data.CharacterListServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
 fun CharacterListScreen(navController: NavHostController) {
     val characterApiService =
-        RetrofitClient.retrofitInstance.create(CharactersServices::class.java)
+        RetrofitClient.retrofitInstance.create(CharacterListServices::class.java)
     var listOfCharacters = remember { mutableStateOf<CharacterListResponse?>(null) }
     LaunchedEffect(listOfCharacters.value) {
         try {
@@ -100,8 +103,6 @@ private fun CharactersGrid(
             items(listOfCharacters.results.size) { index ->
                 CharacterCard(character = listOfCharacters.results[index], onClick = onClick)
             }
-        } else {
-            //loading_State
         }
     }
 }
