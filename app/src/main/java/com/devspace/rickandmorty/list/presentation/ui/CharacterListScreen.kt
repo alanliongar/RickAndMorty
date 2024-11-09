@@ -65,7 +65,7 @@ fun CharacterListScreen(
     navController: NavHostController,
     viewModel: CharacterListViewModel
 ) {
-    val listOfCharacters by viewModel.uiCharacterList.collectAsState()
+    val listOfCharacters by viewModel.uiCharacterListUiState.collectAsState()
     CharacterListContent(listOfCharacters = listOfCharacters) { characterItemClicked ->
         navController.navigate("characterDetail/${characterItemClicked.id}")
     }

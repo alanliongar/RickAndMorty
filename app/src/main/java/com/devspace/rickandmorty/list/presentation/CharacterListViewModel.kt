@@ -2,8 +2,10 @@ package com.devspace.rickandmorty.list.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.devspace.rickandmorty.CharacterApplication
 import com.devspace.rickandmorty.common.RetrofitClient
 import com.devspace.rickandmorty.list.data.CharacterListRepository
 import com.devspace.rickandmorty.list.data.remote.CharacterListService
@@ -17,11 +19,11 @@ import java.net.UnknownHostException
 
 class CharacterListViewModel(private val repository: CharacterListRepository) :
     ViewModel() {
-    private val _uiCharacterList = MutableStateFlow(CharacterListUiState())
-    val uiCharacterList: StateFlow<CharacterListUiState> = _uiCharacterList
+    private val _uiCharacterListUiState = MutableStateFlow(CharacterListUiState())
+    val uiCharacterListUiState: StateFlow<CharacterListUiState> = _uiCharacterListUiState
 
     private fun fetchCharacterList() {
-        _uiCharacterList.value = CharacterListUiState(isLoading = true)
+        _uiCharacterListUiState.value = CharacterListUiState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getCharacterList()
             if (result.isSuccess) {
@@ -35,16 +37,20 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
                                 image = character.imageUrl
                             )
                         }
-                    _uiCharacterList.value = CharacterListUiState(charactersList = charactersUiDataList)
+                    _uiCharacterListUiState.value =
+                        CharacterListUiState(charactersList = charactersUiDataList)
                 } else {
-                    _uiCharacterList.value = CharacterListUiState(isError = true)
+                    _uiCharacterListUiState.value = CharacterListUiState(isError = true)
                 }
             } else {
                 val ex = result.exceptionOrNull()
                 if (ex is UnknownHostException) {
-                    _uiCharacterList.value = CharacterListUiState(isError = true, errorMessage = "No internet connection")
+                    _uiCharacterListUiState.value = CharacterListUiState(
+                        isError = true,
+                        errorMessage = "No internet connection"
+                    )
                 } else {
-                    _uiCharacterList.value = CharacterListUiState(isError = true)
+                    _uiCharacterListUiState.value = CharacterListUiState(isError = true)
                 }
             }
         }
@@ -58,9 +64,10 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val characterListService = RetrofitClient.retrofitInstance.create(CharacterListService::class.java)
-                val characterListRepository = CharacterListRepository(characterListService)
-                return CharacterListViewModel(characterListRepository) as T
+                val application = checkNotNull(extras[APPLICATION_KEY])
+                return CharacterListViewModel(
+                    repository = (application as CharacterApplication).repository
+                ) as T
             }
         }
     }
