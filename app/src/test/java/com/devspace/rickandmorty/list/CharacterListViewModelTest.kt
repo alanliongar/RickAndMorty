@@ -1,5 +1,6 @@
 package com.devspace.rickandmorty.list
 
+import app.cash.turbine.test
 import com.devspace.rickandmorty.common.model.Character
 import com.devspace.rickandmorty.list.data.CharacterListRepository
 import com.devspace.rickandmorty.list.presentation.CharacterListViewModel
@@ -9,8 +10,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -41,20 +40,20 @@ class CharacterListViewModelTest {
             whenever(repository.getFilteredCharacters()).thenReturn(Result.success(charactersList))
 
             //When
-            val result = underTest.uiCharacterListUiState.take(2).toList()[1]
-
-            //Then assert expected value
-            val expected = CharacterListUiState(
-                charactersList = listOf(
-                    CharacterUiData(
-                        id = 1,
-                        name = "Rick Sanchez",
-                        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
-                        specie = "Human"
+            underTest.uiCharacterListUiState.test { //Quando estou testando mais que um item, melhor usar a biblioteca turbine
+                //Then assert expected value
+                val expected = CharacterListUiState(
+                    charactersList = listOf(
+                        CharacterUiData(
+                            id = 1,
+                            name = "Rick Sanchez",
+                            image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
+                            specie = "Human"
+                        )
                     )
                 )
-            )
-            assertEquals(expected, result)
+                assertEquals(expected, awaitItem())
+            }
         }
     }
 
