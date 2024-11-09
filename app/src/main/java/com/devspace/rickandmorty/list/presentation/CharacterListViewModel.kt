@@ -20,12 +20,12 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
     private val _uiCharacterListUiState = MutableStateFlow(CharacterListUiState())
     val uiCharacterListUiState: StateFlow<CharacterListUiState> = _uiCharacterListUiState
 
-    private fun fetchCharacterList() {
+    fun fetchFilteredCharacterList(name: String? = null, species: String? = null) {
         _uiCharacterListUiState.value = CharacterListUiState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getCharacterList()
+            val result = repository.getFilteredCharacters(name = name, species = species)
             if (result.isSuccess) {
-                val characters = result.getOrNull()?: emptyList()
+                val characters = result.getOrNull() ?: emptyList()
                 if (characters != null) {
                     val charactersUiDataList: List<CharacterUiData> =
                         characters.map { character ->
@@ -54,8 +54,42 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
         }
     }
 
+    /*private fun fetchCharacterList() {
+        _uiCharacterListUiState.value = CharacterListUiState(isLoading = true)
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.getCharacterList()
+            if (result.isSuccess) {
+                val characters = result.getOrNull() ?: emptyList()
+                if (characters != null) {
+                    val charactersUiDataList: List<CharacterUiData> =
+                        characters.map { character ->
+                            CharacterUiData(
+                                id = character.id,
+                                name = character.name,
+                                image = character.image
+                            )
+                        }
+                    _uiCharacterListUiState.value =
+                        CharacterListUiState(charactersList = charactersUiDataList)
+                } else {
+                    _uiCharacterListUiState.value = CharacterListUiState(isError = true)
+                }
+            } else {
+                val ex = result.exceptionOrNull()
+                if (ex is UnknownHostException) {
+                    _uiCharacterListUiState.value = CharacterListUiState(
+                        isError = true,
+                        errorMessage = "No internet connection"
+                    )
+                } else {
+                    _uiCharacterListUiState.value = CharacterListUiState(isError = true)
+                }
+            }
+        }
+    }*/
+
     init {
-        fetchCharacterList()
+        fetchFilteredCharacterList()
     }
 
     companion object {

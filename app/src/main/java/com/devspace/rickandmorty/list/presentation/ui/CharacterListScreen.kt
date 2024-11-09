@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,8 +24,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -66,22 +70,93 @@ fun CharacterListScreen(
     viewModel: CharacterListViewModel
 ) {
     val listOfCharacters by viewModel.uiCharacterListUiState.collectAsState()
-    CharacterListContent(listOfCharacters = listOfCharacters) { characterItemClicked ->
+    CharacterListContent(
+        listOfCharacters = listOfCharacters,
+        viewModel = viewModel
+    ) { characterItemClicked ->
         navController.navigate("characterDetail/${characterItemClicked.id}")
+    }
+}
+
+@Composable
+fun SearchAndFilter(viewModel: CharacterListViewModel) {
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedSpecies by remember { mutableStateOf("All") }
+    Row() {
+        TextField(
+            value = searchQuery,
+            onValueChange = { query ->
+                searchQuery = query
+                viewModel.fetchFilteredCharacterList(
+                    name = query,
+                    species = if (selectedSpecies == "All") null else selectedSpecies
+                )
+            }
+        )
+        SpeciesDropdownMenu(
+            selectedSpecies = selectedSpecies,
+            onSpeciesSelected = { species ->
+                selectedSpecies = species
+                viewModel.fetchFilteredCharacterList(
+                    name = if (searchQuery == "") null else searchQuery,
+                    species = if (species == "All") null else species
+                )
+            }
+        )
     }
 }
 
 @Composable
 private fun CharacterListContent(
     listOfCharacters: CharacterListUiState,
+    viewModel: CharacterListViewModel,
     onClick: (CharacterUiData) -> Unit
 ) {
-    if (listOfCharacters.isLoading) {
-        CharacterIsLoading()
-    } else if (listOfCharacters.isError) {
-        CharacterListErrorUiState(errorMsg = listOfCharacters.errorMessage)
-    } else {
-        CharactersGrid(listOfCharacters, onClick = onClick)
+    Column() {
+        SearchAndFilter(viewModel = viewModel)
+        if (listOfCharacters.isLoading) {
+            CharacterIsLoading()
+        } else if (listOfCharacters.isError) {
+            CharacterListErrorUiState(errorMsg = listOfCharacters.errorMessage)
+        } else {
+            CharactersGrid(listOfCharacters, onClick = onClick)
+        }
+    }
+}
+
+@Composable
+fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val speciesOptions =
+        listOf("All", "Human", "Alien", "Mythological", "Animal", "Robot", "Unknown")
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(
+            text = "Espécie: $selectedSpecies",
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+                .padding(8.dp)
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            speciesOptions.forEach { species ->
+                DropdownMenuItem(
+                    text = { Text(text = species) },
+                    onClick = {
+                        onSpeciesSelected(species)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -165,7 +240,9 @@ fun CharacterIsLoading() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             GifImage(
-                modifier = Modifier.size(500.dp).clip(RoundedCornerShape(500.dp)) // Tamanho do GIF
+                modifier = Modifier
+                    .size(500.dp)
+                    .clip(RoundedCornerShape(500.dp)) // Tamanho do GIF
             )
             Text("Loading...", fontSize = 36.sp)
         }

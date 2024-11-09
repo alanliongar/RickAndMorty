@@ -10,7 +10,31 @@ class CharacterListRemoteDataSource(
         return try {
             val result = characterListService.getAllCharacters()
             if (result.isSuccessful) {
-               val characters = result.body()?.results?.map{
+                val characters = result.body()?.results?.map {
+                    Character(
+                        id = it.id,
+                        name = it.name,
+                        image = it.imageUrl
+                    )
+                }
+                Result.success(characters)
+            } else {
+                Result.failure(NetworkErrorException(result.message()))
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            Result.failure(ex)
+        }
+    }
+
+    suspend fun getFilteredCharacters(
+        name: String? = null,
+        species: String? = null
+    ): Result<List<Character>?> {
+        return try {
+            val result = characterListService.getFilteredCharacters(name = name, species = species)
+            if (result.isSuccessful) {
+                val characters = result.body()?.results?.map {
                     Character(
                         id = it.id,
                         name = it.name,

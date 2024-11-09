@@ -10,5 +10,5 @@ data class CharacterListUiState(
 data class CharacterUiData(
     val id: Int,
     val name: String,
-    val image: String
+    val image: String,
 )

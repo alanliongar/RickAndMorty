@@ -9,14 +9,40 @@ class CharacterListRepository(
     private val remote: CharacterListRemoteDataSource,
 ) {
     suspend fun getCharacterList(): Result<List<Character>?> {
-       return try {
+        return try {
             val result = remote.getCharacterList()
             if (result.isSuccess) {
-                val characters = result.getOrNull()?: emptyList()
+                val characters = result.getOrNull() ?: emptyList()
                 if (characters.isNotEmpty()) {
                     local.updateCharacterList(characters)
                     return Result.success(local.getCharacterList())
-                }else{
+                } else {
+                    return result
+                }
+            } else {
+                val localData = local.getCharacterList()
+                if (localData.isEmpty()) {
+                    return result
+                } else {
+                    return Result.success(localData)
+                }
+            }
+
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            Result.failure(ex)
+        }
+    }
+
+    suspend fun getFilteredCharacters(name: String?=null, species: String?=null): Result<List<Character>?> {
+        return try {
+            val result = remote.getFilteredCharacters(name = name, species = species)
+            if (result.isSuccess) {
+                val characters = result.getOrNull() ?: emptyList()
+                if (characters.isNotEmpty()) {
+                    local.updateCharacterList(characters)
+                    return Result.success(local.getCharacterList())
+                } else {
                     return result
                 }
             } else {
