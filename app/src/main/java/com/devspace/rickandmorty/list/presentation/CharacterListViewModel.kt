@@ -20,10 +20,25 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
     private val _uiCharacterListUiState = MutableStateFlow(CharacterListUiState())
     val uiCharacterListUiState: StateFlow<CharacterListUiState> = _uiCharacterListUiState
 
+    suspend fun updateCharacterFavoriteStatus(character: CharacterUiData) {
+        repository.updateCharacterFavorite(character)
+        val updatedCharacter = repository.getUpdatedFavoriteCharacter(character)
+        _uiCharacterListUiState.value = _uiCharacterListUiState.value.copy(
+            charactersList = _uiCharacterListUiState.value.charactersList.map { currentCharacter ->
+                if (currentCharacter.id == updatedCharacter.id) {
+                    // Substitui o personagem atualizado
+                    updatedCharacter
+                } else {
+                    currentCharacter
+                }
+            }
+        )
+    }
+
     fun fetchFilteredCharacterList(name: String? = null, species: String? = null) {
         _uiCharacterListUiState.value = CharacterListUiState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getFilteredCharacters(name = name, species = species)
+            val result = repository.getFilteredCharacters(name = name, specie = species)
             if (result.isSuccess) {
                 val characters = result.getOrNull() ?: emptyList()
                 if (characters != null) {
@@ -32,7 +47,8 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
                             CharacterUiData(
                                 id = character.id,
                                 name = character.name,
-                                image = character.image
+                                image = character.image,
+                                specie = species
                             )
                         }
                     _uiCharacterListUiState.value =
@@ -53,40 +69,6 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
             }
         }
     }
-
-    /*private fun fetchCharacterList() {
-        _uiCharacterListUiState.value = CharacterListUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.getCharacterList()
-            if (result.isSuccess) {
-                val characters = result.getOrNull() ?: emptyList()
-                if (characters != null) {
-                    val charactersUiDataList: List<CharacterUiData> =
-                        characters.map { character ->
-                            CharacterUiData(
-                                id = character.id,
-                                name = character.name,
-                                image = character.image
-                            )
-                        }
-                    _uiCharacterListUiState.value =
-                        CharacterListUiState(charactersList = charactersUiDataList)
-                } else {
-                    _uiCharacterListUiState.value = CharacterListUiState(isError = true)
-                }
-            } else {
-                val ex = result.exceptionOrNull()
-                if (ex is UnknownHostException) {
-                    _uiCharacterListUiState.value = CharacterListUiState(
-                        isError = true,
-                        errorMessage = "No internet connection"
-                    )
-                } else {
-                    _uiCharacterListUiState.value = CharacterListUiState(isError = true)
-                }
-            }
-        }
-    }*/
 
     init {
         fetchFilteredCharacterList()

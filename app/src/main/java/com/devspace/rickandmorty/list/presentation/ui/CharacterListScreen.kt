@@ -24,8 +24,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,6 +40,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +68,7 @@ import coil.size.Size
 import com.devspace.rickandmorty.R
 import com.devspace.rickandmorty.list.presentation.CharacterListViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -69,13 +76,21 @@ fun CharacterListScreen(
     navController: NavHostController,
     viewModel: CharacterListViewModel
 ) {
+    val scope = rememberCoroutineScope()
     val listOfCharacters by viewModel.uiCharacterListUiState.collectAsState()
+
+    val onFavoriteClick: (CharacterUiData) -> Unit = { character ->
+        scope.launch(Dispatchers.IO) { viewModel.updateCharacterFavoriteStatus(character) }
+    }
+
     CharacterListContent(
         listOfCharacters = listOfCharacters,
-        viewModel = viewModel
-    ) { characterItemClicked ->
-        navController.navigate("characterDetail/${characterItemClicked.id}")
-    }
+        viewModel = viewModel,
+        onClick = { characterItemClicked ->
+            navController.navigate("characterDetail/${characterItemClicked.id}")
+        },
+        onFavoriteClick = onFavoriteClick // Passa para o filho
+    )
 }
 
 @Composable
@@ -110,7 +125,8 @@ fun SearchAndFilter(viewModel: CharacterListViewModel) {
 private fun CharacterListContent(
     listOfCharacters: CharacterListUiState,
     viewModel: CharacterListViewModel,
-    onClick: (CharacterUiData) -> Unit
+    onClick: (CharacterUiData) -> Unit,
+    onFavoriteClick: (CharacterUiData) -> Unit
 ) {
     Column() {
         SearchAndFilter(viewModel = viewModel)
@@ -119,7 +135,7 @@ private fun CharacterListContent(
         } else if (listOfCharacters.isError) {
             CharacterListErrorUiState(errorMsg = listOfCharacters.errorMessage)
         } else {
-            CharactersGrid(listOfCharacters, onClick = onClick)
+            CharactersGrid(listOfCharacters, onClick = onClick, onFavoriteClick = onFavoriteClick)
         }
     }
 }
@@ -164,7 +180,8 @@ fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> 
 @Composable
 private fun CharactersGrid(
     listOfCharacters: CharacterListUiState,
-    onClick: (CharacterUiData) -> Unit
+    onClick: (CharacterUiData) -> Unit,
+    onFavoriteClick: (CharacterUiData) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -174,35 +191,44 @@ private fun CharactersGrid(
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         items(listOfCharacters.charactersList.size) { index ->
-            CharacterCard(character = listOfCharacters.charactersList[index], onClick = onClick)
+            CharacterCard(
+                character = listOfCharacters.charactersList[index],
+                onClick = onClick,
+                onFavoriteClick = onFavoriteClick
+            )
         }
     }
 }
 
 @Composable
-private fun CharacterCard(character: CharacterUiData, onClick: (CharacterUiData) -> Unit) {
+private fun CharacterCard(
+    character: CharacterUiData,
+    onClick: (CharacterUiData) -> Unit,
+    onFavoriteClick: (CharacterUiData) -> Unit
+) {
     val imageUrl: String = character.image
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(true) }
     var color by remember { mutableStateOf(Color.Transparent) }
+    var isFavorite by remember { mutableStateOf(false) }
+
     LaunchedEffect(imageUrl) {
         isLoading = true
         val dominantColor = getDominantColorFromImage(context, imageUrl)
         color = dominantColor ?: Color.Transparent
         isLoading = false
     }
-    Column(
+
+    Box(
         modifier = Modifier
             .padding(16.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(color = color)
             .border(2.dp, color, RoundedCornerShape(16.dp))
             .height(200.dp)
-            .clickable { onClick.invoke(character) },
-        // Cor de fundo baseada no personagem
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .clickable { onClick.invoke(character) }
     ) {
+        // Imagem do personagem
         if (isLoading) {
             CharacterIsLoading()
         } else {
@@ -212,21 +238,39 @@ private fun CharacterCard(character: CharacterUiData, onClick: (CharacterUiData)
                     .build(),
                 contentDescription = "Image of ${character.name}",
                 modifier = Modifier
-                    .width(150.dp)
-                    .height(150.dp)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .width(160.dp)
+                    .height(160.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .align(alignment = Alignment.TopCenter),
                 contentScale = ContentScale.Fit
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = character.name,
-                fontWeight = FontWeight.Bold,
-                color = readableColor(color),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                overflow = TextOverflow.Ellipsis
-            )
         }
+        Icon(
+            imageVector = Icons.Default.Star,
+            contentDescription = if (character.isFavorite) "Remover dos favoritos" else "Adicionar aos favoritos",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .width(40.dp)
+                .height(40.dp)
+                .clickable {
+                    onFavoriteClick.invoke(character)
+                },
+            tint = if (character.isFavorite) Color.Yellow else Color.Gray // Cor da estrela
+        )
+
+        // Nome do personagem
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = character.name,
+            fontWeight = FontWeight.Bold,
+            color = readableColor(color),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter), // Alinha o texto na parte inferior do Box
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -241,8 +285,8 @@ fun CharacterIsLoading() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             GifImage(
                 modifier = Modifier
-                    .size(500.dp)
-                    .clip(RoundedCornerShape(500.dp)) // Tamanho do GIF
+                    .size(200.dp)
+                    .clip(RoundedCornerShape(200.dp)) // Tamanho do GIF
             )
             Text("Loading...", fontSize = 36.sp)
         }

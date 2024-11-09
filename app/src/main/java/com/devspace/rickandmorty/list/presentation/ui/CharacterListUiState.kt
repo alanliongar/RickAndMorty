@@ -11,4 +11,6 @@ data class CharacterUiData(
     val id: Int,
     val name: String,
     val image: String,
+    val specie: String? = null,
+    var isFavorite: Boolean = false
 )

@@ -29,10 +29,10 @@ class CharacterListRemoteDataSource(
 
     suspend fun getFilteredCharacters(
         name: String? = null,
-        species: String? = null
+        specie: String? = null
     ): Result<List<Character>?> {
         return try {
-            val result = characterListService.getFilteredCharacters(name = name, species = species)
+            val result = characterListService.getFilteredCharacters(name = name, species = specie)
             if (result.isSuccessful) {
                 val characters = result.body()?.results?.map {
                     Character(

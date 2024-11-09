@@ -9,5 +9,6 @@ data class CharacterListEntity(
     val id: Int,
     val name: String,
     val image: String,
-    val species: String? = null,
+    val specie: String? = null,
+    var isFavorite: Boolean = false
 )
