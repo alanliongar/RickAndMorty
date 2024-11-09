@@ -83,16 +83,20 @@ fun CharacterListScreen(
     val onFavoriteClick: (CharacterUiData) -> Unit = { character ->
         scope.launch(Dispatchers.IO) { viewModel.updateCharacterFavoriteStatus(character) }
     }
+    var fabColor by remember { mutableStateOf(Color.Gray) }
     val onFabClick: () -> Unit = {
         if (favoritesFiltered) {
-            viewModel.fetchFilteredCharacterList()
+            viewModel.getAllCharacters()
             favoritesFiltered = !favoritesFiltered
+            fabColor = Color.Gray
         } else {
             viewModel.getFavoriteCharacters()
             favoritesFiltered = !favoritesFiltered
+            fabColor = Color.Yellow
         }
     }
     CharacterListContent(
+        fabColor = fabColor,
         listOfCharacters = listOfCharacters,
         viewModel = viewModel,
         onClick = { characterItemClicked ->
@@ -136,6 +140,7 @@ fun SearchAndFilter(viewModel: CharacterListViewModel) {
 
 @Composable
 private fun CharacterListContent(
+    fabColor: Color,
     listOfCharacters: CharacterListUiState,
     viewModel: CharacterListViewModel,
     onClick: (CharacterUiData) -> Unit,
@@ -145,7 +150,8 @@ private fun CharacterListContent(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onFabClick // Ação ao clicar no FAB
+                onClick = onFabClick,
+                containerColor = fabColor
             ) {
                 Icon(Icons.Default.Star, contentDescription = "Go to Favorites") // Ícone de exemplo
             }

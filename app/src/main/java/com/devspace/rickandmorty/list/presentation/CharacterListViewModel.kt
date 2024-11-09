@@ -20,8 +20,28 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
     private val _uiCharacterListUiState = MutableStateFlow(CharacterListUiState())
     val uiCharacterListUiState: StateFlow<CharacterListUiState> = _uiCharacterListUiState
 
-    fun getFavoriteCharacters(): List<CharacterUiData> {
-        return _uiCharacterListUiState.value.charactersList.filter { it.isFavorite }
+    fun getFavoriteCharacters() {
+        val favoriteCharacters =
+            _uiCharacterListUiState.value.charactersList.filter { it.isFavorite }
+        _uiCharacterListUiState.value = CharacterListUiState(charactersList = favoriteCharacters)
+    }
+
+    fun getAllCharacters() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val characters = repository.getAllCharacters()
+            val favorites = repository.getFavoriteCharacters()
+            val charactersUiDataList: List<CharacterUiData> = characters.map { character ->
+                CharacterUiData(
+                    id = character.id,
+                    name = character.name,
+                    image = character.image,
+                    specie = character.specie,
+                    isFavorite = character.isFavorite
+                )
+            }
+            _uiCharacterListUiState.value =
+                CharacterListUiState(charactersList = charactersUiDataList)
+        }
     }
 
     suspend fun updateCharacterFavoriteStatus(character: CharacterUiData) {

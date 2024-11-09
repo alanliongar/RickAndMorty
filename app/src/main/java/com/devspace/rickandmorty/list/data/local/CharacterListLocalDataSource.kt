@@ -8,6 +8,19 @@ import com.devspace.rickandmorty.list.presentation.ui.CharacterUiData
 class CharacterListLocalDataSource(
     private val dao: CharacterDao
 ) {
+    suspend fun getFavoriteCharacters(): List<Character> {
+        val favoriteCharacters = dao.getFavoriteCharacters()
+        return favoriteCharacters.map {
+            Character(
+                id = it.id,
+                name = it.name,
+                image = it.image,
+                specie = it.specie,
+                isFavorite = it.isFavorite,
+            )
+        }
+    }
+
     suspend fun updateFavoriteCharacter(character: Character) {
         dao.updateCharacter(
             CharacterListEntity(
@@ -29,17 +42,21 @@ class CharacterListLocalDataSource(
             specie = characterListEntity.specie,
             isFavorite = characterListEntity.isFavorite
         )
-    //retorna um characterlistentity
+        //retorna um characterlistentity
     }
 
-    suspend fun getCharacterList(name: String? = null, specie: String? = null): List<Character> {
+    suspend fun getCharacterList(
+        name: String? = null,
+        specie: String? = null
+    ): List<Character> {
         return dao.getFilteredCharacters(name = name, specie = specie)
             .map { //query no banco de dados!
                 Character(
                     id = it.id,
                     name = it.name,
                     image = it.image,
-                    specie = specie
+                    specie = specie,
+                    isFavorite = it.isFavorite
                 )
             }
     }
@@ -50,7 +67,8 @@ class CharacterListLocalDataSource(
                 id = it.id,
                 name = it.name,
                 image = it.image,
-                specie = it.specie
+                specie = it.specie,
+                isFavorite = it.isFavorite
             )
         })
     }

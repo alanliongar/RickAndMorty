@@ -9,6 +9,11 @@ class CharacterListRepository(
     private val local: CharacterListLocalDataSource,
     private val remote: CharacterListRemoteDataSource,
 ) {
+    suspend fun getFavoriteCharacters(): List<Character> {
+        val favorites = local.getFavoriteCharacters()
+        return favorites
+    }
+
     suspend fun updateCharacterFavorite(character: CharacterUiData) {
         local.updateFavoriteCharacter(
             Character(
@@ -32,6 +37,10 @@ class CharacterListRepository(
         )
     }
 
+    suspend fun getAllCharacters(): List<Character> {
+        return local.getCharacterList()
+    }
+
     suspend fun getFilteredCharacters(
         name: String? = null,
         specie: String? = null
@@ -47,6 +56,7 @@ class CharacterListRepository(
                             name = it.name,
                             image = it.image,
                             specie = specie,
+                            isFavorite = it.isFavorite
                         )
                     }
                     local.updateCharacterList(charactersSpecieced)
