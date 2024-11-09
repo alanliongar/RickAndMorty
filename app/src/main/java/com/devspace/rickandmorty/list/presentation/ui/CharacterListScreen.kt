@@ -145,7 +145,7 @@ private fun CharacterListContent(
     viewModel: CharacterListViewModel,
     onClick: (CharacterUiData) -> Unit,
     onFavoriteClick: (CharacterUiData) -> Unit,
-    onFabClick: () -> Unit // Callback para ação do FAB
+    onFabClick: () -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
@@ -153,7 +153,7 @@ private fun CharacterListContent(
                 onClick = onFabClick,
                 containerColor = fabColor
             ) {
-                Icon(Icons.Default.Star, contentDescription = "Go to Favorites") // Ícone de exemplo
+                Icon(Icons.Default.Star, contentDescription = "Go to Favorites")
             }
         },
         content = { paddingValues ->
@@ -181,35 +181,6 @@ private fun CharacterListContent(
         }
     )
 }
-
-@Composable
-fun SimpleFabScreen() {
-    // Estado para armazenar o texto que será exibido ao clicar no FAB
-    var message by remember { mutableStateOf("Pressione o botão!") }
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    message = "Botão pressionado!" // Atualiza a mensagem ao clicar
-                }
-            ) {
-                Text("+") // Ícone ou texto dentro do FAB
-            }
-        }
-    ) { paddingValues ->
-        // Corpo do Scaffold
-        Text(
-            text = message,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
 
 @Composable
 fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> Unit) {
@@ -298,7 +269,6 @@ private fun CharacterCard(
             .height(200.dp)
             .clickable { onClick.invoke(character) }
     ) {
-        // Imagem do personagem
         if (isLoading) {
             CharacterIsLoading()
         } else {
@@ -326,7 +296,7 @@ private fun CharacterCard(
                 .clickable {
                     onFavoriteClick.invoke(character)
                 },
-            tint = if (character.isFavorite) Color.Yellow else Color.Gray // Cor da estrela
+            tint = if (character.isFavorite) Color.Yellow else Color.Gray
         )
 
         // Nome do personagem
@@ -338,7 +308,7 @@ private fun CharacterCard(
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter), // Alinha o texto na parte inferior do Box
+                .align(Alignment.BottomCenter),
             overflow = TextOverflow.Ellipsis
         )
     }
@@ -356,7 +326,7 @@ fun CharacterIsLoading() {
             GifImage(
                 modifier = Modifier
                     .size(200.dp)
-                    .clip(RoundedCornerShape(200.dp)) // Tamanho do GIF
+                    .clip(RoundedCornerShape(200.dp))
             )
             Text("Loading...", fontSize = 36.sp)
         }
@@ -452,7 +422,6 @@ suspend fun getDominantColorFromImage(
             val result = (imageLoader.execute(request) as SuccessResult).drawable
             if (result is BitmapDrawable) {
                 val bitmap = result.bitmap
-                // Verifica se o bitmap é do tipo HARDWARE e converte se necessário
                 val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
                 val palette = Palette.from(mutableBitmap).generate()

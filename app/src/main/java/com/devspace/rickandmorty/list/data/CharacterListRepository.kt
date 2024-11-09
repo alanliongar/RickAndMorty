@@ -9,11 +9,6 @@ class CharacterListRepository(
     private val local: CharacterListLocalDataSource,
     private val remote: CharacterListRemoteDataSource,
 ) {
-    suspend fun getFavoriteCharacters(): List<Character> {
-        val favorites = local.getFavoriteCharacters()
-        return favorites
-    }
-
     suspend fun updateCharacterFavorite(character: CharacterUiData) {
         local.updateFavoriteCharacter(
             Character(
@@ -25,6 +20,7 @@ class CharacterListRepository(
             )
         )
     }
+
     suspend fun getUpdatedFavoriteCharacter(character: CharacterUiData): CharacterUiData {
         return local.getUpdatedFavoriteCharacter(
             Character(
@@ -46,20 +42,22 @@ class CharacterListRepository(
         specie: String? = null
     ): Result<List<Character>?> {
         return try {
+            //Abordagem levemente diferente: ele verifica se existe algum favorito antes de sair jogando dados da API pro banco;
+            //Depois de guardar os favoritos, ele chama a API, alimenta o banco e devolve o status de favorito pros ids que já o tinham.
+            //Segura essa abordagem por enquanto.
+            val existingFavorites = local.getFavoriteCharacters()
             val result = remote.getFilteredCharacters(name = name, specie = specie)
             if (result.isSuccess) {
                 val characters = result.getOrNull() ?: emptyList()
+
                 if (characters.isNotEmpty()) {
-                    val charactersSpecieced = characters.map {
-                        Character(
-                            id = it.id,
-                            name = it.name,
-                            image = it.image,
-                            specie = specie,
-                            isFavorite = it.isFavorite
-                        )
+                    val charactersWithFavorites = characters.map {
+                        val isFavorite = existingFavorites.any { favorite -> favorite.id == it.id }
+                        it.copy(isFavorite = if (isFavorite) true else false)
                     }
-                    local.updateCharacterList(charactersSpecieced)
+
+                    local.updateCharacterList(charactersWithFavorites)
+
                     return Result.success(local.getCharacterList(name = name, specie = specie))
                 } else {
                     return result
@@ -77,5 +75,4 @@ class CharacterListRepository(
             Result.failure(ex)
         }
     }
-
 }
