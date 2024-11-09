@@ -4,7 +4,7 @@ import com.devspace.rickandmorty.detail.model.CharacterDetailDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface CharacterDetailServices {
+interface CharacterDetailService {
     @GET("character/{id}")
     suspend fun getCharacterById(@Path("id") id: Int): CharacterDetailDto
 }

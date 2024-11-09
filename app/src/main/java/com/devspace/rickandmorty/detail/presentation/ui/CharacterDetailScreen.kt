@@ -1,6 +1,5 @@
 package com.devspace.rickandmorty.detail.presentation.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +19,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,32 +35,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.devspace.rickandmorty.detail.model.CharacterDetailDto
-import com.devspace.rickandmorty.common.RetrofitClient
-import com.devspace.rickandmorty.detail.data.CharacterDetailServices
+import com.devspace.rickandmorty.detail.presentation.CharacterDetailViewModel
 import com.devspace.rickandmorty.list.presentation.ui.getDominantColorFromImage
 import com.devspace.rickandmorty.list.presentation.ui.readableColor
 
 @Composable
-fun CharacterDetailScreen(characterId: String) {
-    val characterApiService =
-        RetrofitClient.retrofitInstance.create(CharacterDetailServices::class.java)
-    var characterDetail = remember { mutableStateOf<CharacterDetailDto?>(null) }
-    LaunchedEffect(characterDetail.value) {
-        try {
-            val response = characterApiService.getCharacterById(characterId.toInt())
-            characterDetail.value = response
-            Log.d("CharacterDetailScreen", "Success")
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            Log.d("CharacterDetailScreen", ex.message.toString())
-            characterDetail.value = null
-        }
+fun CharacterDetailScreen(characterId: String, viewModel: CharacterDetailViewModel) {
+    val characterDetail by viewModel.uiCharacterDetail.collectAsState()
+    LaunchedEffect(characterId) {
+        viewModel.fetchCharacterDetail(characterId.toInt())
     }
-    characterDetail.value?.let { CharacterDetailContent(character = it) }
+    characterDetail?.let { CharacterDetailContent(character = it) }
 }
 
 @Composable
-fun CharacterDetailContent(character: CharacterDetailDto, modifier: Modifier = Modifier) {
+fun CharacterDetailContent(character: CharacterDetailDto) {
     val context = LocalContext.current
     val color = remember { mutableStateOf(Color.Transparent) }
     LaunchedEffect(character) {
@@ -107,23 +97,17 @@ fun CharacterDetailContent(character: CharacterDetailDto, modifier: Modifier = M
 
 @Composable
 private fun AdjustableTextSize(character: CharacterDetailDto, color: Color) {
-    // Tamanho máximo da fonte
-    val maxFontSize = 36f // Usando Float para cálculo
-    // Definindo um limite máximo de caracteres para reduzir o tamanho da fonte
-    val maxLength = 20 // Pode ajustar esse valor dependendo de quanto você quer de limite
-
-    // Calcular o tamanho da fonte baseado no comprimento do nome
+    //Essa função só serve pra determinar o tamanho da fonte do nome do personagem
+    val maxFontSize = 36f
+    val maxLength = 20
     val fontSize = if (character.name.length > maxLength) {
-        // Se o nome for maior que o limite, reduz o tamanho da fonte proporcionalmente
         (maxFontSize * (maxLength.toFloat() / character.name.length)).coerceAtMost(maxFontSize)
     } else {
         maxFontSize
     }
-
-    // Convertendo de volta para TextUnit (sp)
     Text(
         text = character.name,
-        fontSize = fontSize.sp, // Convertendo o valor para TextUnit (sp)
+        fontSize = fontSize.sp,
         color = readableColor(color),
         fontWeight = FontWeight.Bold
     )
@@ -139,7 +123,6 @@ fun CharacterInfo(character: CharacterDetailDto, color: Color) {
     ) {
         val fontSize = 20.sp
         val space = 8.dp
-
         InfoRow(
             label = "Status:", value = if (character.status == "") {
                 "[Empty]"

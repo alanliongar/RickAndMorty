@@ -22,7 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,43 +46,27 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.devspace.rickandmorty.list.model.CharacterDto
 import com.devspace.rickandmorty.list.model.CharacterListResponse
-import com.devspace.rickandmorty.common.RetrofitClient
-import com.devspace.rickandmorty.list.data.remote.CharacterListServices
+import com.devspace.rickandmorty.list.presentation.CharacterListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun CharacterListScreen(navController: NavHostController) {
-    val characterApiService =
-        RetrofitClient.retrofitInstance.create(CharacterListServices::class.java)
-    var listOfCharacters = remember { mutableStateOf<CharacterListResponse?>(null) }
-    LaunchedEffect(listOfCharacters.value) {
-        try {
-            val response = characterApiService.getAllCharacters()
-            if (response.results.isNotEmpty()) {
-                listOfCharacters.value = response
-                Log.d("CharacterListScreen", "Success")
-            } else {
-                listOfCharacters.value = null
-                Log.d("CharacterListScreen", "EmptyCall")
-            }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            Log.d("CharacterListScreen", ex.message.toString())
-            listOfCharacters.value = null
-        }
-    }
+fun CharacterListScreen(
+    navController: NavHostController,
+    viewModel: CharacterListViewModel
+) {
+    val listOfCharacters by viewModel.uiCharacterList.collectAsState()
     CharacterListContent(listOfCharacters = listOfCharacters) { characterItemClicked ->
         navController.navigate("characterDetail/${characterItemClicked.id}")
     }
 }
 
 @Composable
-private fun CharacterListContent(listOfCharacters: MutableState<CharacterListResponse?>, onClick: (CharacterDto) -> Unit) {
-    if (listOfCharacters.value == null) {
+private fun CharacterListContent(listOfCharacters: CharacterListResponse?, onClick: (CharacterDto) -> Unit) {
+    if (listOfCharacters == null) {
         Text("Carregando....")
     } else {
-        CharactersGrid(listOfCharacters.value, onClick = onClick)
+        CharactersGrid(listOfCharacters, onClick = onClick)
     }
 }
 
@@ -154,10 +138,10 @@ private fun CharacterCard(character: CharacterDto, onClick: (CharacterDto) -> Un
 fun readableColor(color: Color): Color {
     val luminance = 0.2126 * color.red + 0.7152 * color.green + 0.0722 * color.blue
 
-    return if (luminance > 0.5) { //muito claro
-        Color.Black  // Preto, no caso de uma cor de fundo considerada muito clara
+    return if (luminance > 0.5) {
+        Color.Blue //Azul escuro no caso de uma cor de fundo considerada muito clara
     } else {
-        Color(0f, 1f, 0f)  // Verde vibrante, escolha de paleta
+        Color(0f, 1f, 0f) //Verde radioativo quando a cor de fundo é escura
     }
 }
 
@@ -179,7 +163,7 @@ suspend fun getDominantColorFromImage(
 
                 val palette = Palette.from(mutableBitmap).generate()
                 val dominantColor =
-                    palette.getDominantColor(androidx.compose.ui.graphics.Color.Black.toArgb())
+                    palette.getDominantColor(Color.Black.toArgb()) //Graças à Gabrielle Hallasc
                 Color(dominantColor).copy(alpha = 0.70f)
             } else {
                 null
