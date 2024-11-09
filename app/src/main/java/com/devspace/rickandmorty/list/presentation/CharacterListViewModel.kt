@@ -9,13 +9,16 @@ import com.devspace.rickandmorty.CharacterApplication
 import com.devspace.rickandmorty.list.data.CharacterListRepository
 import com.devspace.rickandmorty.list.presentation.ui.CharacterListUiState
 import com.devspace.rickandmorty.list.presentation.ui.CharacterUiData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.net.UnknownHostException
 
-class CharacterListViewModel(private val repository: CharacterListRepository) : ViewModel() {
+class CharacterListViewModel(
+    private val repository: CharacterListRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ViewModel() {
 
     private val _uiCharacterListUiState = MutableStateFlow(CharacterListUiState())
     val uiCharacterListUiState: StateFlow<CharacterListUiState> = _uiCharacterListUiState
@@ -27,7 +30,7 @@ class CharacterListViewModel(private val repository: CharacterListRepository) : 
     }
 
     fun getAllCharacters() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
             val characters = repository.getAllCharacters()
             val charactersUiDataList: List<CharacterUiData> = characters.map { character ->
                 CharacterUiData(
@@ -45,7 +48,7 @@ class CharacterListViewModel(private val repository: CharacterListRepository) : 
 
     fun fetchFilteredCharacterList(name: String? = null, species: String? = null) {
         _uiCharacterListUiState.value = CharacterListUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
             val result = repository.getFilteredCharacters(name = name, specie = species)
             if (result.isSuccess) {
                 val characters = result.getOrNull() ?: emptyList()
