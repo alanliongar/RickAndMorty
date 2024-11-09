@@ -62,7 +62,7 @@ fun CharacterListScreen(
 }
 
 @Composable
-private fun CharacterListContent(listOfCharacters: CharacterListResponse?, onClick: (CharacterDto) -> Unit) {
+private fun CharacterListContent(listOfCharacters: CharacterListUiState, onClick: (CharacterUiData) -> Unit) {
     if (listOfCharacters == null) {
         Text("Carregando....")
     } else {
@@ -73,8 +73,8 @@ private fun CharacterListContent(listOfCharacters: CharacterListResponse?, onCli
 
 @Composable
 private fun CharactersGrid(
-    listOfCharacters: CharacterListResponse?,
-    onClick: (CharacterDto) -> Unit
+    listOfCharacters: CharacterListUiState,
+    onClick: (CharacterUiData) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -82,18 +82,15 @@ private fun CharactersGrid(
         contentPadding = PaddingValues(0.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp)
-    ) {
-        if (listOfCharacters != null) {
-            items(listOfCharacters.results.size) { index ->
-                CharacterCard(character = listOfCharacters.results[index], onClick = onClick)
+    ) { items(listOfCharacters.characters.size) { index ->
+                CharacterCard(character = listOfCharacters.characters[index], onClick = onClick)
             }
-        }
     }
 }
 
 @Composable
-private fun CharacterCard(character: CharacterDto, onClick: (CharacterDto) -> Unit) {
-    val imageUrl: String = character.imageUrl
+private fun CharacterCard(character: CharacterUiData, onClick: (CharacterUiData) -> Unit) {
+    val imageUrl: String = character.image
     val context = LocalContext.current
     var color by remember { mutableStateOf(Color.Transparent) }
     LaunchedEffect(imageUrl) {

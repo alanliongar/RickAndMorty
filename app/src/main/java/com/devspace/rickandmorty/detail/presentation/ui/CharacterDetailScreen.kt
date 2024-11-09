@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,9 +40,16 @@ import com.devspace.rickandmorty.detail.presentation.CharacterDetailViewModel
 import com.devspace.rickandmorty.list.presentation.ui.getDominantColorFromImage
 import com.devspace.rickandmorty.list.presentation.ui.readableColor
 
-@Composable
+@Composable //Optei por NÃO COLOCAR o navhostcontroller, não julguei necessário ter um botão pra voltar, mas sei que daria, não "esqueci".
 fun CharacterDetailScreen(characterId: String, viewModel: CharacterDetailViewModel) {
     val characterDetail by viewModel.uiCharacterDetail.collectAsState()
+
+    DisposableEffect(Unit) { //ao invés do navhost, o usuário que volte com a navegação do android dele.
+        onDispose {
+            viewModel.clearState()
+        }
+    }
+
     LaunchedEffect(characterId) {
         viewModel.fetchCharacterDetail(characterId.toInt())
     }
@@ -55,6 +63,8 @@ fun CharacterDetailContent(character: CharacterDetailDto) {
     LaunchedEffect(character) {
         color.value = getDominantColorFromImage(context, character.image) ?: Color.Transparent
     }
+
+
 
     Box(
         modifier = Modifier
