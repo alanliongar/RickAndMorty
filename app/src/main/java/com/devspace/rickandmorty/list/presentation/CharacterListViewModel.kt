@@ -6,9 +6,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.devspace.rickandmorty.CharacterApplication
-import com.devspace.rickandmorty.common.RetrofitClient
 import com.devspace.rickandmorty.list.data.CharacterListRepository
-import com.devspace.rickandmorty.list.data.remote.CharacterListService
 import com.devspace.rickandmorty.list.presentation.ui.CharacterListUiState
 import com.devspace.rickandmorty.list.presentation.ui.CharacterUiData
 import kotlinx.coroutines.Dispatchers

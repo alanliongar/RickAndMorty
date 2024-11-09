@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty.common
+package com.devspace.rickandmorty.common.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

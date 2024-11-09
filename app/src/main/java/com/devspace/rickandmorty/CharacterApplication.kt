@@ -2,7 +2,7 @@ package com.devspace.rickandmorty
 
 import android.app.Application
 import androidx.room.Room
-import com.devspace.rickandmorty.common.RetrofitClient
+import com.devspace.rickandmorty.common.remote.RetrofitClient
 import com.devspace.rickandmorty.common.local.AppDataBase
 import com.devspace.rickandmorty.list.data.CharacterListRepository
 import com.devspace.rickandmorty.list.data.local.CharacterListLocalDataSource

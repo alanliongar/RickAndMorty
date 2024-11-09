@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty.list.model
+package com.devspace.rickandmorty.common.remote.model
 
 data class CharacterDto(
     val id: Int,

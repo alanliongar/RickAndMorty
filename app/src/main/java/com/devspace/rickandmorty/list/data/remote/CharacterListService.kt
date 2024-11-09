@@ -1,6 +1,6 @@
 package com.devspace.rickandmorty.list.data.remote
 
-import com.devspace.rickandmorty.list.model.CharacterListResponse
+import com.devspace.rickandmorty.common.remote.model.CharacterListResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

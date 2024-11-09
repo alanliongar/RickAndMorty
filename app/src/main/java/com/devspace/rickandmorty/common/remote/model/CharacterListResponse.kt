@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty.list.model
+package com.devspace.rickandmorty.common.remote.model
 
 import com.google.gson.annotations.SerializedName
 
