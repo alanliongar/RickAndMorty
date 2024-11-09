@@ -11,11 +11,11 @@ import com.devspace.rickandmorty.list.presentation.ui.CharacterListScreen
 
 
 @Composable
-fun RickandMortyApp() {
-    val navcontroller = rememberNavController()
-    NavHost(navController = navcontroller, startDestination = "characterList") {
+fun RickAndMortyApp() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "characterList") {
         composable("characterList") {
-            CharacterListScreen(navController = navcontroller)
+            CharacterListScreen(navController = navController)
         }
         composable(
             route = "characterDetail/{characterId}",

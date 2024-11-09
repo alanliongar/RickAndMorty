@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty.list.data
+package com.devspace.rickandmorty.list.model
 
 import androidx.room.Dao
 import androidx.room.Insert

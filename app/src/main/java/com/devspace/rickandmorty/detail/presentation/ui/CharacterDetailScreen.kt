@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.devspace.rickandmorty.detail.data.CharacterDetailDto
+import com.devspace.rickandmorty.detail.model.CharacterDetailDto
 import com.devspace.rickandmorty.common.RetrofitClient
 import com.devspace.rickandmorty.detail.data.CharacterDetailServices
 import com.devspace.rickandmorty.list.presentation.ui.getDominantColorFromImage

@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty.detail.data
+package com.devspace.rickandmorty.detail.model
 
 data class CharacterDetailDto(
     val id: Int,

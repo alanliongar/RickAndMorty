@@ -1,4 +1,4 @@
-package com.devspace.rickandmorty.list.data
+package com.devspace.rickandmorty.list.model
 
 data class CharacterDto(
     val id: Int,

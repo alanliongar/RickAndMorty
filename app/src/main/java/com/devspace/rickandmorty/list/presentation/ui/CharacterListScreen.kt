@@ -44,10 +44,10 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.devspace.rickandmorty.list.data.CharacterDto
-import com.devspace.rickandmorty.list.data.CharacterListResponse
+import com.devspace.rickandmorty.list.model.CharacterDto
+import com.devspace.rickandmorty.list.model.CharacterListResponse
 import com.devspace.rickandmorty.common.RetrofitClient
-import com.devspace.rickandmorty.list.data.CharacterListServices
+import com.devspace.rickandmorty.list.data.remote.CharacterListServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
