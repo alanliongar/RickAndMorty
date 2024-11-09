@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 
 class CharacterDetailViewModel(private val characterDetailService: CharacterDetailService) :
     ViewModel() {
@@ -36,12 +37,17 @@ class CharacterDetailViewModel(private val characterDetailService: CharacterDeta
                     Log.d("CharacterDetailScreen", "Success")
                 } else {
                     Log.d("CharacterDetailScreen", "Request Error :: ${response.errorBody()}")
-                    _uiCharacterDetail.value = CharacterDetailUiState(isError = true, errorMessage = "The request failed")
+                    _uiCharacterDetail.value =
+                        CharacterDetailUiState(isError = true, errorMessage = "The request failed")
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 Log.d("CharacterDetailScreen", ex.message.toString())
-                _uiCharacterDetail.value = CharacterDetailUiState(isError = true, errorMessage = ex.message.toString())
+                if (ex is UnknownHostException) {
+                    _uiCharacterDetail.value = CharacterDetailUiState(isError = true, errorMessage = "No internet connection")
+                } else {
+                    _uiCharacterDetail.value = CharacterDetailUiState(isError = true, errorMessage = ex.message.toString())
+                }
             }
         }
     }

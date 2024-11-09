@@ -98,8 +98,8 @@ private fun CharactersGrid(
         verticalArrangement = Arrangement.spacedBy(3.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
-        items(listOfCharacters.characters.size) { index ->
-            CharacterCard(character = listOfCharacters.characters[index], onClick = onClick)
+        items(listOfCharacters.charactersList.size) { index ->
+            CharacterCard(character = listOfCharacters.charactersList[index], onClick = onClick)
         }
     }
 }
@@ -179,7 +179,7 @@ fun GifImage(
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .components {
-            if (SDK_INT >= 30) {
+            if (SDK_INT >= 28) {
                 add(ImageDecoderDecoder.Factory())
             } else {
                 add(GifDecoder.Factory())
