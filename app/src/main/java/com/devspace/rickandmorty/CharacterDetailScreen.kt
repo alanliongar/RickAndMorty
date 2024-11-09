@@ -101,7 +101,7 @@ fun CharacterDetailContent(character: CharacterDetailDto, modifier: Modifier = M
 }
 
 @Composable
-fun AdjustableTextSize(character: CharacterDetailDto, color: Color) {
+private fun AdjustableTextSize(character: CharacterDetailDto, color: Color) {
     // Tamanho máximo da fonte
     val maxFontSize = 36f // Usando Float para cálculo
     // Definindo um limite máximo de caracteres para reduzir o tamanho da fonte
@@ -191,7 +191,7 @@ fun CharacterInfo(character: CharacterDetailDto, color: Color) {
 }
 
 @Composable
-fun InfoRow(label: String, value: String, fontSize: TextUnit, color: Color) {
+private fun InfoRow(label: String, value: String, fontSize: TextUnit, color: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

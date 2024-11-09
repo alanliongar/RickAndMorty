@@ -151,11 +151,12 @@ private fun CharacterCard(character: CharacterDto, onClick: (CharacterDto) -> Un
 }
 
 fun readableColor(color: Color): Color {
-    val luminance = 0.2126f * color.red + 0.7152f * color.green + 0.0722f * color.blue
-    return if (luminance > 0.5f) {
-        Color.Black
+    val luminance = 0.2126 * color.red + 0.7152 * color.green + 0.0722 * color.blue
+
+    return if (luminance > 0.5) { //muito claro
+        Color.Black  // Preto, no caso de uma cor de fundo considerada muito clara
     } else {
-        Color.White
+        Color(0f, 1f, 0f)  // Verde vibrante, escolha de paleta
     }
 }
 
