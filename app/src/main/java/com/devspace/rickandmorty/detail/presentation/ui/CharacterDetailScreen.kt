@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.devspace.rickandmorty.detail.model.CharacterDetailDto
 import com.devspace.rickandmorty.detail.presentation.CharacterDetailViewModel
+import com.devspace.rickandmorty.list.presentation.ui.CharacterListErrorUiState
+import com.devspace.rickandmorty.list.presentation.ui.CharacterIsLoading
 import com.devspace.rickandmorty.list.presentation.ui.getDominantColorFromImage
 import com.devspace.rickandmorty.list.presentation.ui.readableColor
 
@@ -57,52 +59,74 @@ fun CharacterDetailScreen(characterId: String, viewModel: CharacterDetailViewMod
 }
 
 @Composable
-fun CharacterDetailContent(character: CharacterDetailDto) {
+fun CharacterDetailContent(character: CharacterDetailUiState) {
     val context = LocalContext.current
     val color = remember { mutableStateOf(Color.Transparent) }
+    val characterDetail = character.character
+
     LaunchedEffect(character) {
-        color.value = getDominantColorFromImage(context, character.image) ?: Color.Transparent
+        character.isLoading = true
+        color.value =
+            getDominantColorFromImage(context, characterDetail?.image) ?: Color.Transparent
+        character.isLoading = false
     }
 
+    when {
+        character.isLoading -> {
+            CharacterIsLoading()
+        }
 
+        character.isError -> {
+            CharacterListErrorUiState(errorMsg = character.errorMessage)
+        }
 
-    Box(
-        modifier = Modifier
-            .background(color.value)
-            .fillMaxSize()
-    )
-    {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AdjustableTextSize(character = character, color = color.value)
-            Text(
-                text = "#${character?.id.toString()?.padStart(3, '0')}",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp), color = readableColor(color.value)
-            )
-            AsyncImage(
-                model = character.image,
-                contentDescription = "Image of the character ${character.name}",
+        else -> {
+            Box(
                 modifier = Modifier
-                    .height(300.dp)
-                    .clip(RoundedCornerShape(64.dp)),
-                contentScale = ContentScale.Fit,
+                    .background(color.value)
+                    .fillMaxSize()
             )
-            Spacer(modifier = Modifier.size(6.dp))
-            Text(
-                text = "Character detail information",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold, color = readableColor(color.value)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            CharacterInfo(character = character, color = readableColor(color.value))
+            {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    characterDetail?.let { AdjustableTextSize(character = it, color = color.value) }
+                    Text(
+                        text = "#${characterDetail?.id.toString()?.padStart(3, '0')}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp), color = readableColor(color.value)
+                    )
+                    AsyncImage(
+                        model = characterDetail?.image,
+                        contentDescription = "Image of the character ${characterDetail?.name}",
+                        modifier = Modifier
+                            .height(300.dp)
+                            .clip(RoundedCornerShape(64.dp)),
+                        contentScale = ContentScale.Fit,
+                    )
+                    Spacer(modifier = Modifier.size(6.dp))
+                    Text(
+                        text = "Character detail information",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold, color = readableColor(color.value)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    characterDetail?.let {
+                        CharacterInfo(
+                            character = it,
+                            color = readableColor(color.value)
+                        )
+                    }
+                }
+            }
         }
     }
+
+
 }
 
 @Composable
@@ -129,7 +153,7 @@ fun CharacterInfo(character: CharacterDetailDto, color: Color) {
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .verticalScroll(rememberScrollState()) // permite rolar caso o conteúdo exceda a tela
+            .verticalScroll(rememberScrollState())
     ) {
         val fontSize = 20.sp
         val space = 8.dp

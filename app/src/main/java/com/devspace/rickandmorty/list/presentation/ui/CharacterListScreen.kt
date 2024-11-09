@@ -77,7 +77,9 @@ private fun CharacterListContent(
     onClick: (CharacterUiData) -> Unit
 ) {
     if (listOfCharacters.isLoading) {
-        Text("Carregando....") //teladecarregando
+        CharacterIsLoading()
+    } else if (listOfCharacters.isError) {
+        CharacterListErrorUiState(errorMsg = listOfCharacters.errorMessage)
     } else {
         CharactersGrid(listOfCharacters, onClick = onClick)
     }
@@ -127,7 +129,7 @@ private fun CharacterCard(character: CharacterUiData, onClick: (CharacterUiData)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isLoading) {
-            CharacterListIsLoading()
+            CharacterIsLoading()
         } else {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -154,7 +156,7 @@ private fun CharacterCard(character: CharacterUiData, onClick: (CharacterUiData)
 }
 
 @Composable
-fun CharacterListIsLoading() {
+fun CharacterIsLoading() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -163,9 +165,9 @@ fun CharacterListIsLoading() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             GifImage(
-                modifier = Modifier.size(500.dp).clip(RoundedCornerShape(250.dp)) // Tamanho do GIF
+                modifier = Modifier.size(500.dp).clip(RoundedCornerShape(500.dp)) // Tamanho do GIF
             )
-            Text("Loading...", fontSize = 24.sp)
+            Text("Loading...", fontSize = 36.sp)
         }
     }
 }
@@ -207,29 +209,29 @@ fun CharacterListErrorUiState(errorMsg: String? = null) {
         Text(
             fontSize = 36.sp,
             modifier = Modifier.padding(16.dp),
-            color = Color.Red,
+            color = Color.Green,
             text = "Ohh No!",
             fontWeight = FontWeight.Bold
         )
         Image(
             painter = painterResource(id = R.drawable.error_image),
-            contentDescription = "Imagem de erro",
+            contentDescription = "Error image",
             modifier = Modifier
-                .width(432.dp)
-                .height(577.dp),
+                .width(450.dp)
+                .height(550.dp),
             contentScale = ContentScale.FillHeight
         )
         Text(
             fontSize = 32.sp,
-            modifier = Modifier.padding(16.dp),
-            color = Color.Red,
+            modifier = Modifier.padding(8.dp),
+            color = Color.Green,
             text = "Something went wrong!",
             fontWeight = FontWeight.Bold
         )
         Text(
             fontSize = 20.sp,
             modifier = Modifier.padding(16.dp),
-            color = Color.Blue,
+            color = Color.Green,
             text = errorMsg ?: "Go back and try again",
             fontWeight = FontWeight.Bold
         )
