@@ -28,5 +28,8 @@ fun RickAndMortyApp(characterListViewModel: CharacterListViewModel, characterDet
             val characterId = requireNotNull(backStackEntry.arguments?.getString("characterId"))
             CharacterDetailScreen(characterId = characterId, viewModel = characterDetailViewModel)
         }
+        composable("favorites") {
+
+        }
     }
 }

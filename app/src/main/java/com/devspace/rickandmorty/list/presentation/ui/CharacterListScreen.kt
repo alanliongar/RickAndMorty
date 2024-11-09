@@ -25,11 +25,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -74,20 +77,29 @@ fun CharacterListScreen(
     navController: NavHostController,
     viewModel: CharacterListViewModel
 ) {
+    var favoritesFiltered by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val listOfCharacters by viewModel.uiCharacterListUiState.collectAsState()
-
     val onFavoriteClick: (CharacterUiData) -> Unit = { character ->
         scope.launch(Dispatchers.IO) { viewModel.updateCharacterFavoriteStatus(character) }
     }
-
+    val onFabClick: () -> Unit = {
+        if (favoritesFiltered) {
+            viewModel.fetchFilteredCharacterList()
+            favoritesFiltered = !favoritesFiltered
+        } else {
+            viewModel.getFavoriteCharacters()
+            favoritesFiltered = !favoritesFiltered
+        }
+    }
     CharacterListContent(
         listOfCharacters = listOfCharacters,
         viewModel = viewModel,
         onClick = { characterItemClicked ->
             navController.navigate("characterDetail/${characterItemClicked.id}")
         },
-        onFavoriteClick = onFavoriteClick
+        onFavoriteClick = onFavoriteClick,
+        onFabClick = onFabClick
     )
 }
 
@@ -127,19 +139,71 @@ private fun CharacterListContent(
     listOfCharacters: CharacterListUiState,
     viewModel: CharacterListViewModel,
     onClick: (CharacterUiData) -> Unit,
-    onFavoriteClick: (CharacterUiData) -> Unit
+    onFavoriteClick: (CharacterUiData) -> Unit,
+    onFabClick: () -> Unit // Callback para ação do FAB
 ) {
-    Column() {
-        SearchAndFilter(viewModel = viewModel)
-        if (listOfCharacters.isLoading) {
-            CharacterIsLoading()
-        } else if (listOfCharacters.isError) {
-            CharacterListErrorUiState(errorMsg = listOfCharacters.errorMessage)
-        } else {
-            CharactersGrid(listOfCharacters, onClick = onClick, onFavoriteClick = onFavoriteClick)
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onFabClick // Ação ao clicar no FAB
+            ) {
+                Icon(Icons.Default.Star, contentDescription = "Go to Favorites") // Ícone de exemplo
+            }
+        },
+        content = { paddingValues ->
+            Column(modifier = Modifier.padding(paddingValues)) {
+                SearchAndFilter(viewModel = viewModel)
+
+                when {
+                    listOfCharacters.isLoading -> {
+                        CharacterIsLoading()
+                    }
+
+                    listOfCharacters.isError -> {
+                        CharacterListErrorUiState(errorMsg = listOfCharacters.errorMessage)
+                    }
+
+                    else -> {
+                        CharactersGrid(
+                            listOfCharacters,
+                            onClick = onClick,
+                            onFavoriteClick = onFavoriteClick
+                        )
+                    }
+                }
+            }
         }
+    )
+}
+
+@Composable
+fun SimpleFabScreen() {
+    // Estado para armazenar o texto que será exibido ao clicar no FAB
+    var message by remember { mutableStateOf("Pressione o botão!") }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    message = "Botão pressionado!" // Atualiza a mensagem ao clicar
+                }
+            ) {
+                Text("+") // Ícone ou texto dentro do FAB
+            }
+        }
+    ) { paddingValues ->
+        // Corpo do Scaffold
+        Text(
+            text = message,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
+
 
 @Composable
 fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> Unit) {
