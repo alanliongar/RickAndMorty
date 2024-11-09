@@ -25,14 +25,14 @@ class CharacterListViewModel(private val repository: CharacterListRepository) :
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getCharacterList()
             if (result.isSuccess) {
-                val characters = result.getOrNull()?.results ?: emptyList()
+                val characters = result.getOrNull()?: emptyList()
                 if (characters != null) {
                     val charactersUiDataList: List<CharacterUiData> =
                         characters.map { character ->
                             CharacterUiData(
                                 id = character.id,
                                 name = character.name,
-                                image = character.imageUrl
+                                image = character.image
                             )
                         }
                     _uiCharacterListUiState.value =
