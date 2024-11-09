@@ -195,7 +195,7 @@ fun SpeciesDropdownMenu(selectedSpecies: String, onSpeciesSelected: (String) -> 
             "Human",
             "Humanoid",
             "Mythological",
-            "Poppybutthole",
+            "Poopybutthole",
             "Robot",
             "unknown"
         )
@@ -381,7 +381,7 @@ fun CharacterListErrorUiState(errorMsg: String? = null) {
     ) {
         Text(
             fontSize = 36.sp,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(0.dp),
             color = Color.Green,
             text = "Ohh No!",
             fontWeight = FontWeight.Bold
@@ -396,14 +396,14 @@ fun CharacterListErrorUiState(errorMsg: String? = null) {
         )
         Text(
             fontSize = 32.sp,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(4.dp),
             color = Color.Green,
             text = "Something went wrong!",
             fontWeight = FontWeight.Bold
         )
         Text(
             fontSize = 20.sp,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(4.dp),
             color = Color.Green,
             text = errorMsg ?: "Go back and try again",
             fontWeight = FontWeight.Bold
