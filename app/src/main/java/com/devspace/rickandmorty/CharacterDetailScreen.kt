@@ -91,7 +91,7 @@ fun CharacterDetailContent(character: CharacterDetailDto, modifier: Modifier = M
             Spacer(modifier = Modifier.size(6.dp))
             Text(
                 text = "Character detail information",
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold, color = readableColor(color.value)
             )
             Spacer(modifier = Modifier.height(8.dp))
