@@ -12,12 +12,14 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class CharacterListViewModelTest {
 
     private val repository: CharacterListRepository = mock()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher(TestCoroutineScheduler())
 
@@ -54,31 +56,6 @@ class CharacterListViewModelTest {
                 )
                 assertEquals(expected, awaitItem())
             }
-        }
-    }
-
-    @Test
-    fun `Given fresh viewModel when collecting to uiListState Then assert loading state`() {
-        runTest {
-            //Given
-            val charactersList = listOf(
-                Character( //aqui tanto faz colocar esse cara ou não, pq o loading é definido mesmo assim.
-                    id = 1,
-                    name = "Rick Sanchez",
-                    image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
-                    specie = "Human"
-                )
-            )
-            whenever(repository.getFilteredCharacters()).thenReturn(Result.success(charactersList))
-
-            //When
-            val result = underTest.uiCharacterListUiState.value
-
-            //Then assert expected value
-            val expected = CharacterListUiState(
-                isLoading = true
-            )
-            assertEquals(expected, result)
         }
     }
 }

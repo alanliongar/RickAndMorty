@@ -3,13 +3,12 @@ package com.devspace.rickandmorty.list.data.local
 import com.devspace.rickandmorty.common.local.CharacterDao
 import com.devspace.rickandmorty.common.local.CharacterListEntity
 import com.devspace.rickandmorty.common.model.Character
-import com.devspace.rickandmorty.list.data.LocalDataSource
 import com.devspace.rickandmorty.list.presentation.ui.CharacterUiData
 
 class CharacterListLocalDataSource(
     private val dao: CharacterDao
-): LocalDataSource {
-    override suspend fun getFavoriteCharacters(): List<Character> {
+) {
+    suspend fun getFavoriteCharacters(): List<Character> {
         val favoriteCharacters = dao.getFavoriteCharacters()
         return favoriteCharacters.map {
             Character(
@@ -22,7 +21,7 @@ class CharacterListLocalDataSource(
         }
     }
 
-    override suspend fun updateFavoriteCharacter(character: Character) {
+    suspend fun updateFavoriteCharacter(character: Character) {
         dao.updateCharacter(
             CharacterListEntity(
                 id = character.id,
@@ -62,7 +61,7 @@ class CharacterListLocalDataSource(
             }
     }
 
-    override suspend fun updateCharacterList(characters: List<Character>) {
+    suspend fun updateCharacterList(characters: List<Character>) {
         dao.insertAll(characters.map {
             CharacterListEntity(
                 id = it.id,
