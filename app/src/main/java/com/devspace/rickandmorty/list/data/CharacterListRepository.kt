@@ -45,19 +45,17 @@ class CharacterListRepository(
             //Abordagem levemente diferente: ele verifica se existe algum favorito antes de sair jogando dados da API pro banco;
             //Depois de guardar os favoritos, ele chama a API, alimenta o banco e devolve o status de favorito pros ids que já o tinham.
             //Segura essa abordagem por enquanto.
-            val existingFavorites = local.getFavoriteCharacters()
+            val existingFavorites = local.getFavoriteCharacters()?: emptyList()
             val result = remote.getFilteredCharacters(name = name, specie = specie)
             if (result.isSuccess) {
                 val characters = result.getOrNull() ?: emptyList()
 
                 if (characters.isNotEmpty()) {
                     val charactersWithFavorites = characters.map {
-                        val isFavorite = existingFavorites.any { favorite -> favorite.id == it.id }
-                        it.copy(isFavorite = if (isFavorite) true else false)
+                        val isFavorite = existingFavorites?.any { favorite -> favorite.id == it.id }
+                        it.copy(isFavorite = if (isFavorite?: false) true else false)
                     }
-
                     local.updateCharacterList(charactersWithFavorites)
-
                     return Result.success(local.getCharacterList(name = name, specie = specie))
                 } else {
                     return result
