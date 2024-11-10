@@ -11,6 +11,7 @@ import com.devspace.rickandmorty.list.presentation.ui.CharacterListUiState
 import com.devspace.rickandmorty.list.presentation.ui.CharacterUiData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ class CharacterListViewModel(
                         isFavorite = character.isFavorite
                     )
                 }
+                delay(2000) //coloquei esse delay só pra vcs olharem o loading kkkkkkkkkk
                 _uiCharacterListUiState.value =
                     CharacterListUiState(charactersList = charactersUiDataList)
             } else {
