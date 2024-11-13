@@ -40,6 +40,7 @@ class CharacterListViewModelTest {
             )
             whenever(repository.getFilteredCharacters()).thenReturn(Result.success(charactersList))
 
+            underTest.fetchFilteredCharacterList()
             //When
             underTest.uiCharacterListUiState.test { //Quando estou testando mais que um item, melhor usar a biblioteca turbine
                 //Then assert expected value
