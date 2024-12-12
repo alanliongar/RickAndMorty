@@ -10,12 +10,9 @@ Features
 - Dynamic Floating Action Button: Tap to toggle between showing all characters or only favorited ones.
 :camera_flash: Screenshots
 <p float="left"> 
-  <img src="https://github.com/user-attachments/assets/rick1" width="250" /> 
-  <img src="https://github.com/user-attachments/assets/rick2" width="250" /> 
-  <img src="https://github.com/user-attachments/assets/rick3" width="250" /> <br> 
-  <img src="https://github.com/user-attachments/assets/rick4" width="250" /> 
-  <img src="https://github.com/user-attachments/assets/rick5" width="250" /> 
-  <img src="https://github.com/user-attachments/assets/rick6" width="250" />
+  <img src="https://github.com/alanliongar/rickandmorty/blob/master/Screenshot_20241212_202308.png" width="250" /> 
+  <img src="https://github.com/alanliongar/rickandmorty/blob/master/Screenshot_20241212_202320.png" width="250" /> 
+  <img src="https://github.com/alanliongar/rickandmorty/blob/master/Screenshot_20241212_202421.png" width="250" />
 </p>
 
 ## Technologies
@@ -35,6 +32,8 @@ Features
   - ComposePreview
   - NavHostController
   - AsyncImage
+- Coil: Used for rendering GIFs and SVGs efficiently
+- Palette: Extracts the dominant color from character images and applies it to the card backgrounds for a cohesive UI
 - Room Database
 - Retrofit
 - Rick and Morty API
